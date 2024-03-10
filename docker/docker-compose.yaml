@@ -1,0 +1,120 @@
+version: '3'
+
+services:
+  users-db:
+    image: 'postgres:latest'
+    ports:
+      - 15432:5432
+    env_file: ./env/user-service.env
+    networks:
+      - platform
+    volumes:
+      - ./db-data/user-db/:/var/lib/postgresql/data/
+      - ./initdb/user-service.sql:/docker-entrypoint-initdb.d/user-service.sql
+
+  
+  transaction-db:
+    image: postgres:latest
+    env_file: ./env/transaction-service.env
+    ports:
+      - 15433:5432
+    networks:
+      - platform
+    volumes:
+      - ./db-data/transaction-db/:/var/lib/postgresql/data/
+      - ./initdb/transaction-service.sql:/docker-entrypoint-initdb.d/transaction-service.sql
+
+
+  nats:
+    image: nats:alpine
+    container_name: nats
+    restart: always
+    command: -c /etc/nats/nats.conf
+    ports:
+      - "4222:4222" # client port
+      - "6222:6222" # cluster port
+      - "8222:8222" # monitoring port
+    volumes:
+      - ./nats/nats.conf:/etc/nats/nats.conf
+      - ./storage/jetstream:/data
+    networks:
+      - platform
+
+  exporter:
+    image: natsio/prometheus-nats-exporter
+    container_name: nats-exporter
+    restart: always
+    command: 
+      # see https://github.com/nats-io/prometheus-nats-exporter/blob/main/main.go#L87
+      # "-connz",               # connection metrics
+      - -connz_detailed         # advanced connection metrics
+      - -jsz
+      - all                # jetstream metrics
+      - -routez                 # route metrics
+      - -subz                   # subscription metrics
+      - -varz                   # general metrics
+      - -prefix=nats            # prefix for all metrics
+      - -use_internal_server_id # using serverID from /varz
+      - http://nats:8222/
+    networks:
+      - platform
+    labels:
+      org.label-schema.group: "nats-monitoring"
+    depends_on:
+      - nats
+
+    # ports:
+    #   - "7777:7777"
+    
+  surveyor:
+    image: natsio/nats-surveyor
+    container_name: nats-surveyor
+    restart: always
+    volumes:
+      - ./observations:/observations
+      - ./storage/jetstream:/data
+    command: |
+      -s "nats://nats:4222" --accounts --observe /observations --jetstream /data
+    networks:
+      - platform
+    labels:
+      org.label-schema.group: "nats-monitoring"
+    depends_on:
+      - nats
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - ./storage/prometheus:/usr/local/share/prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/usr/local/share/prometheus
+    networks:
+      - platform
+    labels:
+      org.label-schema.group: "nats-monitoring"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - surveyor
+      - exporter
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - platform
+    labels:
+      org.label-schema.group: "nats-monitoring"
+    depends_on:
+      - prometheus
+networks: 
+  platform:
+    driver: bridge

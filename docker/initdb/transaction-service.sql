@@ -1,0 +1,8 @@
+CREATE TABLE transactions (
+    transaction_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL, -- This acts as a logical reference to a User in the User Service.
+    type VARCHAR(50) NOT NULL, -- e.g., 'credit', 'debit', 'transfer'
+    amount DECIMAL(10, 2) NOT NULL,
+    reference_user_id INT, -- For transfers, this acts as a logical reference to another User.
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
