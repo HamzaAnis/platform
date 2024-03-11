@@ -14,7 +14,7 @@ func configure(appName string) (*logging.Logger, error) {
 	var logger logging.LeveledBackend
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	formatter := logging.MustStringFormatter(
-		`%{longfile} %{color:bold} ▶ [%{level:.6s}] %{message}%{color:reset}`,
+		`%{longfile} %{color:bold} ▶ [%{module}] [%{level:.6s}] %{message}%{color:reset}`,
 	)
 
 	backendFormatter := logging.NewBackendFormatter(backend, formatter)

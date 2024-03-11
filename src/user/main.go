@@ -18,7 +18,7 @@ type serverA struct {
 }
 
 func (s *serverA) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	s.logger.Log().Info("Running the user app")
+	s.logger.Log().Info("Running the user app", pb.User_ServiceDesc.ServiceName)
 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
@@ -30,7 +30,7 @@ func main() {
 	s := grpc.NewServer()
 
 	pb.RegisterUserServer(s, &serverA{
-		logger: logger.NewLogger("user"),
+		logger: logger.NewLogger(pb.User_ServiceDesc.ServiceName),
 	})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
