@@ -6,6 +6,7 @@ import (
 	"net"
 
 	pb "github.com/HamzaAnis/platform/gen/user"
+	"github.com/HamzaAnis/platform/pkg/logger"
 
 	"google.golang.org/grpc"
 )
@@ -13,10 +14,11 @@ import (
 type serverA struct {
 	pb.UnimplementedUserServer
 	// Add NATS connection if needed
+	logger logger.Logger
 }
 
 func (s *serverA) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	// Logic to interact with ServiceB over NATS or directly return a response
+	s.logger.Log().Info("Running the user app")
 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
@@ -26,7 +28,10 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterUserServer(s, &serverA{})
+
+	pb.RegisterUserServer(s, &serverA{
+		logger: logger.NewLogger("user"),
+	})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

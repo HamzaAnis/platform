@@ -3,6 +3,7 @@ module github.com/HamzaAnis/platform
 go 1.19
 
 require (
+	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
