@@ -1,32 +1,34 @@
 package main
 
 import (
-	"context"
-	"log"
 	"net"
+	"os"
 
 	pb "github.com/HamzaAnis/platform/gen/transaction"
-	"github.com/HamzaAnis/platform/pkg/postgres"
+	"github.com/HamzaAnis/platform/pkg/logger"
+	"github.com/HamzaAnis/platform/src/transaction/server"
 
 	"google.golang.org/grpc"
 )
 
-type serverB struct {
-	pb.UnimplementedTransactionServer
-}
+var (
+	log = logger.Logger(pb.Transaction_ServiceDesc.ServiceName)
+)
 
-func (s *serverB) SayGoodbye(ctx context.Context, in *pb.GoodbyeRequest) (*pb.GoodbyeReply, error) {
-	return &pb.GoodbyeReply{Message: "Goodbye there " + in.Name}, nil
+type serverB struct {
+	pb.TransactionServer
 }
 
 func main() {
-	postgres.NewPostgres()
-	lis, err := net.Listen("tcp", ":50052")
+	lis, err := net.Listen("tcp", ":"+os.Getenv("SERVICE_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterTransactionServer(s, &serverB{})
+
+	serverImpl := server.NewTransactionServer()
+
+	pb.RegisterTransactionServer(s, serverImpl)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
