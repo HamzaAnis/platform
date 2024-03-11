@@ -115,6 +115,44 @@ services:
       org.label-schema.group: "nats-monitoring"
     depends_on:
       - prometheus
+
+  envoy:
+    image: envoyproxy/envoy:v1.18.3
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ../proto/combined.pb:/data/combined.pb 
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    networks:
+      - platform
+    command: "/usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l debug"
+
+  user-service:
+    build:
+      context: ../.
+      dockerfile: ./src/user/Dockerfile
+    ports:
+      - "50051:50051"
+    command: tail -F anything
+    networks:
+      - platform
+    depends_on:
+      - nats
+      - users-db
+
+  transaction-service:
+    build:
+      context: ../.
+      dockerfile: ./src/transaction/Dockerfile
+    ports:
+      - "50052:50052"
+    command: tail -F anything
+    networks:
+      - platform
+    depends_on:
+      - nats
+      - transaction-db
 networks: 
   platform:
     driver: bridge
