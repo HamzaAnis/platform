@@ -1,8 +1,9 @@
 version: '3'
 
 services:
-  users-db:
+  user-db:
     image: 'postgres:latest'
+    container_name: user-db
     ports:
       - 15432:5432
     env_file: ./env/user-service.env
@@ -15,6 +16,7 @@ services:
   
   transaction-db:
     image: postgres:latest
+    container_name: transaction-db
     env_file: ./env/transaction-service.env
     ports:
       - 15433:5432
@@ -118,6 +120,7 @@ services:
 
   envoy:
     image: envoyproxy/envoy:v1.18.3
+    container_name: envoy
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ../proto/combined.pb:/data/combined.pb 
@@ -129,19 +132,21 @@ services:
     command: "/usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l debug"
 
   user-service:
+    container_name: user-service
     build:
       context: ../.
       dockerfile: ./src/user/Dockerfile
-    env_file: ./env/users-service.env
+    env_file: ./env/user-service.env
     ports:
       - "50051:50051"
     networks:
       - platform
     depends_on:
       - nats
-      - users-db
+      - user-db
 
   transaction-service:
+    container_name: transaction-service
     build:
       context: ../.
       dockerfile: ./src/transaction/Dockerfile
