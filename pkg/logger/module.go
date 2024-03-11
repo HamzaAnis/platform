@@ -1,28 +1,21 @@
 package logger
 
 import (
-	"log"
+	"os"
 
 	"github.com/op/go-logging"
 )
 
-type Logger interface {
-	Log() *logging.Logger
-}
+func Logger(appName string) *logging.Logger {
+	var logger logging.LeveledBackend
+	backend := logging.NewLogBackend(os.Stderr, "", 0)
+	formatter := logging.MustStringFormatter(
+		`%{shortfile} %{color:bold} ▶ [%{module}] [%{level:.6s}] %{message}%{color:reset}`,
+	)
 
-type loggerImpl struct {
-	logger *logging.Logger
-}
+	backendFormatter := logging.NewBackendFormatter(backend, formatter)
+	logger = logging.SetBackend(backendFormatter)
 
-// Assert that *loggerImpl satisfies the Logger interface
-var _ Logger = &loggerImpl{}
-
-func NewLogger(appName string) Logger {
-	logger, err := configure(appName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &loggerImpl{
-		logger: logger,
-	}
+	logger.SetLevel(logging.DEBUG, "")
+	return logging.MustGetLogger(appName)
 }

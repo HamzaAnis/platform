@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net"
 
 	pb "github.com/HamzaAnis/platform/gen/user"
@@ -11,27 +10,27 @@ import (
 	"google.golang.org/grpc"
 )
 
+var (
+	log = logger.Logger(pb.User_ServiceDesc.ServiceName)
+)
+
 type serverA struct {
 	pb.UnimplementedUserServer
-	// Add NATS connection if needed
-	logger logger.Logger
 }
 
 func (s *serverA) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	s.logger.Log().Info("Running the user app", pb.User_ServiceDesc.ServiceName)
+	log.Info("Running the user app", pb.User_ServiceDesc.ServiceName)
 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":50053")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 
-	pb.RegisterUserServer(s, &serverA{
-		logger: logger.NewLogger(pb.User_ServiceDesc.ServiceName),
-	})
+	pb.RegisterUserServer(s, &serverA{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
