@@ -134,7 +134,6 @@ services:
       dockerfile: ./src/user/Dockerfile
     ports:
       - "50051:50051"
-    command: tail -F anything
     networks:
       - platform
     depends_on:
@@ -147,7 +146,6 @@ services:
       dockerfile: ./src/transaction/Dockerfile
     ports:
       - "50052:50052"
-    command: tail -F anything
     networks:
       - platform
     depends_on:
