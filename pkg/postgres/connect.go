@@ -25,6 +25,6 @@ func connect() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 
-	log.Info("⛁ Connected to MySQL Database!")
+	log.Info("⛁ Connected to Postgres Database!")
 	return db, nil
 }

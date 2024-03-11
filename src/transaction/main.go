@@ -6,6 +6,7 @@ import (
 	"net"
 
 	pb "github.com/HamzaAnis/platform/gen/transaction"
+	"github.com/HamzaAnis/platform/pkg/postgres"
 
 	"google.golang.org/grpc"
 )
@@ -19,6 +20,7 @@ func (s *serverB) SayGoodbye(ctx context.Context, in *pb.GoodbyeRequest) (*pb.Go
 }
 
 func main() {
+	postgres.NewPostgres()
 	lis, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
