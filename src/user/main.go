@@ -5,7 +5,9 @@ import (
 	"net"
 
 	pb "github.com/HamzaAnis/platform/gen/user"
+	"github.com/HamzaAnis/platform/pkg/config"
 	"github.com/HamzaAnis/platform/pkg/logger"
+	"github.com/HamzaAnis/platform/pkg/postgres"
 
 	"google.golang.org/grpc"
 )
@@ -24,7 +26,13 @@ func (s *serverA) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloR
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50053")
+	err := config.LoadConfig("docker/env/user-service.env")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	postgres.NewPostgres()
+	lis, err := net.Listen("tcp", ":"+config.Cfg.Port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

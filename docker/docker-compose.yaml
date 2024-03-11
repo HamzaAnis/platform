@@ -132,6 +132,7 @@ services:
     build:
       context: ../.
       dockerfile: ./src/user/Dockerfile
+    env_file: ./env/users-service.env
     ports:
       - "50051:50051"
     networks:
@@ -144,6 +145,7 @@ services:
     build:
       context: ../.
       dockerfile: ./src/transaction/Dockerfile
+    env_file: ./env/transaction-service.env
     ports:
       - "50052:50052"
     networks:

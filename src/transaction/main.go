@@ -26,6 +26,6 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterTransactionServer(s, &serverB{})
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve1: %v", err)
+		log.Fatalf("failed to serve: %v", err)
 	}
 }
