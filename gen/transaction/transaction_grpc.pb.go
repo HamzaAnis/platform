@@ -19,14 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Transaction_SayGoodbye_FullMethodName = "/transaction.Transaction/SayGoodbye"
+	Transaction_Up_FullMethodName       = "/transaction.Transaction/Up"
+	Transaction_Down_FullMethodName     = "/transaction.Transaction/Down"
+	Transaction_Transfer_FullMethodName = "/transaction.Transaction/Transfer"
 )
 
 // TransactionClient is the client API for Transaction service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransactionClient interface {
-	SayGoodbye(ctx context.Context, in *GoodbyeRequest, opts ...grpc.CallOption) (*GoodbyeReply, error)
+	Up(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionReply, error)
+	Down(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionReply, error)
+	Transfer(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferReply, error)
 }
 
 type transactionClient struct {
@@ -37,9 +41,27 @@ func NewTransactionClient(cc grpc.ClientConnInterface) TransactionClient {
 	return &transactionClient{cc}
 }
 
-func (c *transactionClient) SayGoodbye(ctx context.Context, in *GoodbyeRequest, opts ...grpc.CallOption) (*GoodbyeReply, error) {
-	out := new(GoodbyeReply)
-	err := c.cc.Invoke(ctx, Transaction_SayGoodbye_FullMethodName, in, out, opts...)
+func (c *transactionClient) Up(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionReply, error) {
+	out := new(TransactionReply)
+	err := c.cc.Invoke(ctx, Transaction_Up_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transactionClient) Down(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionReply, error) {
+	out := new(TransactionReply)
+	err := c.cc.Invoke(ctx, Transaction_Down_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transactionClient) Transfer(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferReply, error) {
+	out := new(TransferReply)
+	err := c.cc.Invoke(ctx, Transaction_Transfer_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +72,9 @@ func (c *transactionClient) SayGoodbye(ctx context.Context, in *GoodbyeRequest, 
 // All implementations must embed UnimplementedTransactionServer
 // for forward compatibility
 type TransactionServer interface {
-	SayGoodbye(context.Context, *GoodbyeRequest) (*GoodbyeReply, error)
+	Up(context.Context, *TransactionRequest) (*TransactionReply, error)
+	Down(context.Context, *TransactionRequest) (*TransactionReply, error)
+	Transfer(context.Context, *TransferRequest) (*TransferReply, error)
 	mustEmbedUnimplementedTransactionServer()
 }
 
@@ -58,8 +82,14 @@ type TransactionServer interface {
 type UnimplementedTransactionServer struct {
 }
 
-func (UnimplementedTransactionServer) SayGoodbye(context.Context, *GoodbyeRequest) (*GoodbyeReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SayGoodbye not implemented")
+func (UnimplementedTransactionServer) Up(context.Context, *TransactionRequest) (*TransactionReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Up not implemented")
+}
+func (UnimplementedTransactionServer) Down(context.Context, *TransactionRequest) (*TransactionReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Down not implemented")
+}
+func (UnimplementedTransactionServer) Transfer(context.Context, *TransferRequest) (*TransferReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Transfer not implemented")
 }
 func (UnimplementedTransactionServer) mustEmbedUnimplementedTransactionServer() {}
 
@@ -74,20 +104,56 @@ func RegisterTransactionServer(s grpc.ServiceRegistrar, srv TransactionServer) {
 	s.RegisterService(&Transaction_ServiceDesc, srv)
 }
 
-func _Transaction_SayGoodbye_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GoodbyeRequest)
+func _Transaction_Up_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransactionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TransactionServer).SayGoodbye(ctx, in)
+		return srv.(TransactionServer).Up(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Transaction_SayGoodbye_FullMethodName,
+		FullMethod: Transaction_Up_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TransactionServer).SayGoodbye(ctx, req.(*GoodbyeRequest))
+		return srv.(TransactionServer).Up(ctx, req.(*TransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Transaction_Down_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServer).Down(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Transaction_Down_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServer).Down(ctx, req.(*TransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Transaction_Transfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServer).Transfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Transaction_Transfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServer).Transfer(ctx, req.(*TransferRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -100,8 +166,16 @@ var Transaction_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TransactionServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SayGoodbye",
-			Handler:    _Transaction_SayGoodbye_Handler,
+			MethodName: "Up",
+			Handler:    _Transaction_Up_Handler,
+		},
+		{
+			MethodName: "Down",
+			Handler:    _Transaction_Down_Handler,
+		},
+		{
+			MethodName: "Transfer",
+			Handler:    _Transaction_Transfer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
