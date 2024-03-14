@@ -4,13 +4,20 @@ import (
 	"context"
 	"os"
 
+	pb "github.com/HamzaAnis/platform/gen/user"
 	"github.com/HamzaAnis/platform/pkg/jwt"
+	"github.com/HamzaAnis/platform/pkg/logger"
 	"github.com/HamzaAnis/platform/pkg/postgres"
 	"github.com/HamzaAnis/platform/src/user/db"
 )
 
+var (
+	log = logger.Logger(pb.User_ServiceDesc.ServiceName)
+)
+
 type UserAPI interface {
 	Login(ctx context.Context, userID int64) (*string, error)
+	GetBalanceAPI(context.Context) (float64, error)
 }
 
 type userAPIImpl struct {

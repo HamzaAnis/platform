@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (j *jwtImpl) VerifyToken(ctx context.Context, token string) (*CustomClaims, error) {
-	keyFunc := func(token *jwt.Token) (interface{}, error) {
-		return []byte(j.secret), nil
-	}
-
+func (j *jwtImpl) VerifyToken(ctx context.Context) (*CustomClaims, error) {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		keyFunc := func(token *jwt.Token) (interface{}, error) {
+			return []byte(j.secret), nil
+		}
+
 		if vals, ok := md["authorization"]; ok && len(vals) > 0 {
 			token := strings.TrimPrefix(vals[0], "Bearer ")
 			jwtToken, err := jwt.ParseWithClaims(token, &CustomClaims{}, keyFunc)

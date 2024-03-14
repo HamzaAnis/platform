@@ -12,7 +12,7 @@ var (
 
 type JWT interface {
 	GenerateToken(int64) (*string, error)
-	VerifyToken(context.Context, string) (*CustomClaims, error)
+	VerifyToken(context.Context) (*CustomClaims, error)
 }
 
 type jwtImpl struct {

@@ -15,6 +15,7 @@ var (
 
 type UserDB interface {
 	GetUser(context.Context, int64) (*models.User, error)
+	GetUserBalance(context.Context) (float64, error)
 }
 
 type userDBImpl struct {

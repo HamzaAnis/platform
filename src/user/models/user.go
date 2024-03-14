@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	UserID       int       `db:"user_id"`
+	UserID       int64     `db:"user_id"`
 	Username     string    `db:"username"`
 	PasswordHash string    `db:"password_hash"`
 	Balance      float64   `db:"balance"`

@@ -6,6 +6,7 @@ option go_package = "/user";
 
 service User {
   rpc Login (LoginRequest) returns (LoginReply) {}
+  rpc GetBalance (GetBalanceRequest) returns (GetBalanceReply) {}
 }
 
 message LoginRequest {
@@ -14,4 +15,11 @@ message LoginRequest {
 
 message LoginReply {
   string token = 1;
+}
+
+message GetBalanceRequest {
+}
+
+message GetBalanceReply {
+  double balance = 1;
 }
