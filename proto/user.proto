@@ -5,13 +5,13 @@ package user;
 option go_package = "/user";
 
 service User {
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc Login (LoginRequest) returns (LoginReply) {}
 }
 
-message HelloRequest {
-  string name = 1;
+message LoginRequest {
+  int64 userID = 1;
 }
 
-message HelloReply {
-  string message = 1;
+message LoginReply {
+  string token = 1;
 }

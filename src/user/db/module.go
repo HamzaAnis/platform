@@ -1,15 +1,27 @@
 package db
 
-import "database/sql"
+import (
+	"context"
+
+	pb "github.com/HamzaAnis/platform/gen/user"
+	"github.com/HamzaAnis/platform/pkg/logger"
+	"github.com/HamzaAnis/platform/src/user/models"
+	"github.com/jmoiron/sqlx"
+)
+
+var (
+	log = logger.Logger(pb.User_ServiceDesc.ServiceName)
+)
 
 type UserDB interface {
+	GetUser(context.Context, int64) (*models.User, error)
 }
 
 type userDBImpl struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewUserDB(db *sql.DB) UserDB {
+func NewUserDB(db *sqlx.DB) UserDB {
 	return &userDBImpl{
 		db: db,
 	}

@@ -1,15 +1,17 @@
 package db
 
-import "database/sql"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 type TransactionDB interface {
 }
 
 type transactionDBImpl struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewTransactionDB(db *sql.DB) TransactionDB {
+func NewTransactionDB(db *sqlx.DB) TransactionDB {
 	return &transactionDBImpl{
 		db: db,
 	}

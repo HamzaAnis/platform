@@ -3,6 +3,8 @@ module github.com/HamzaAnis/platform
 go 1.19
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.9
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/spf13/viper v1.18.2

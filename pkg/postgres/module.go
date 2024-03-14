@@ -1,9 +1,8 @@
 package postgres
 
 import (
-	"database/sql"
-
 	"github.com/HamzaAnis/platform/pkg/logger"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
@@ -12,11 +11,11 @@ var (
 )
 
 type Postgres interface {
-	GetDB() *sql.DB
+	GetDB() *sqlx.DB
 }
 
 type postgresImpl struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
 // Assert that *postgresImpl satisfies the Postgres interface
