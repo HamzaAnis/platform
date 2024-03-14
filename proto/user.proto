@@ -4,9 +4,20 @@ package user;
 
 option go_package = "/user";
 
+import "google/api/annotations.proto";
+
 service User {
-  rpc Login (LoginRequest) returns (LoginReply) {}
-  rpc GetBalance (GetBalanceRequest) returns (GetBalanceReply) {}
+  rpc Login (LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/login"
+      body: "*"
+    };
+  }
+  rpc GetBalance (GetBalanceRequest) returns (GetBalanceReply) {
+    option (google.api.http) = {
+      get: "/balance"
+    };
+  }
 }
 
 message LoginRequest {
